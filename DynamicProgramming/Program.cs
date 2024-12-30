@@ -48,32 +48,26 @@ class DiceSum
     // This approach uses recursion and memoization to reduce redundant calculations.
     public static int CountWaysRecursiveMemo(int n, int m, int X, Dictionary<(int, int), int> memo = null)
     {
-        // Inicializo tabelën e memoizimit nëse nuk është dhënë
         if (memo == null)
         {
             memo = new Dictionary<(int, int), int>();
         }
 
-        // Rasti bazë: Nëse nuk ka zare, mund të arrihet vetëm shuma 0
         if (n == 0)
             return X == 0 ? 1 : 0;
 
-        // Nëse shuma është negative, nuk ka kombinime të vlefshme
         if (X < 0)
             return 0;
 
-        // Kontrollo në tabelën e memoizimit
         if (memo.ContainsKey((n, X)))
             return memo[(n, X)];
 
-        // Llogarit numrin e mënyrave për të arritur shumën me zarët aktuale
         int ways = 0;
         for (int face = 1; face <= m; face++)
         {
             ways += CountWaysRecursiveMemo(n - 1, m, X - face, memo);
         }
 
-        // Ruaj rezultatin në tabelën e memoizimit
         memo[(n, X)] = ways;
         return ways;
     }
