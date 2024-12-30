@@ -8,56 +8,76 @@ class DiceSum
     {
         int[,] dp = new int[n + 1, X + 1];
 
-        // Base case: 1 way to achieve sum 0 with 0 dice
         dp[0, 0] = 1;
 
         for (int dice = 1; dice <= n; dice++)
         {
-            for (int target = 1; target <= X; target++)
+            for (int target = 0; target <= X; target++)
             {
+                dp[dice, target] = 0;
+
                 for (int face = 1; face <= m; face++)
                 {
                     if (target - face >= 0)
                     {
                         dp[dice, target] += dp[dice - 1, target - face];
+
+                        // Debugging: 
+                        // Console.WriteLine($"dp[{dice}, {target}] += dp[{dice - 1}, {target - face}] ({dp[dice - 1, target - face]}) -> {dp[dice, target]}");
                     }
                 }
             }
         }
 
+        //// Debugging: 
+        //Console.WriteLine("\nTabela DP përfundimtare:");
+        //for (int i = 0; i <= n; i++)
+        //{
+        //    for (int j = 0; j <= X; j++)
+        //    {
+        //        Console.Write($"{dp[i, j]} ");
+        //    }
+        //    Console.WriteLine();
+        //}
+
         return dp[n, X];
     }
 
+
     // Solution 2: Recursive Approach with Memoization
     // This approach uses recursion and memoization to reduce redundant calculations.
-    public static int CountWaysRecursiveMemo(int n, int m, int X, int[,] memo = null)
+    public static int CountWaysRecursiveMemo(int n, int m, int X, Dictionary<(int, int), int> memo = null)
     {
+        // Inicializo tabelën e memoizimit nëse nuk është dhënë
         if (memo == null)
         {
-            memo = new int[n + 1, X + 1];
-            for (int i = 0; i <= n; i++)
-                for (int j = 0; j <= X; j++)
-                    memo[i, j] = -1;
+            memo = new Dictionary<(int, int), int>();
         }
 
+        // Rasti bazë: Nëse nuk ka zare, mund të arrihet vetëm shuma 0
         if (n == 0)
             return X == 0 ? 1 : 0;
 
+        // Nëse shuma është negative, nuk ka kombinime të vlefshme
         if (X < 0)
             return 0;
 
-        if (memo[n, X] != -1)
-            return memo[n, X];
+        // Kontrollo në tabelën e memoizimit
+        if (memo.ContainsKey((n, X)))
+            return memo[(n, X)];
 
+        // Llogarit numrin e mënyrave për të arritur shumën me zarët aktuale
         int ways = 0;
         for (int face = 1; face <= m; face++)
         {
             ways += CountWaysRecursiveMemo(n - 1, m, X - face, memo);
         }
 
-        memo[n, X] = ways;
+        // Ruaj rezultatin në tabelën e memoizimit
+        memo[(n, X)] = ways;
         return ways;
     }
+
 
     // Solution 3: Recursive Approach without Memoization
     // This approach uses plain recursion without storing intermediate results.
@@ -83,16 +103,19 @@ class DiceSum
         Console.WriteLine("Dynamic Programming Approach:");
         Console.WriteLine(CountWaysDP(4, 2, 1));
         Console.WriteLine(CountWaysDP(4, 2, 5));
+        Console.WriteLine(CountWaysDP(3, 3, 5));
         Console.WriteLine(CountWaysDP(4, 3, 5));
 
         Console.WriteLine("\nRecursive Approach with Memoization:");
         Console.WriteLine(CountWaysRecursiveMemo(4, 2, 1));
         Console.WriteLine(CountWaysRecursiveMemo(4, 2, 5));
+        Console.WriteLine(CountWaysRecursiveMemo(3, 3, 5));
         Console.WriteLine(CountWaysRecursiveMemo(4, 3, 5));
 
         Console.WriteLine("\nRecursive Approach without Memoization:");
         Console.WriteLine(CountWaysRecursive(4, 2, 1));
         Console.WriteLine(CountWaysRecursive(4, 2, 5));
+        Console.WriteLine(CountWaysRecursive(3, 3, 5));
         Console.WriteLine(CountWaysRecursive(4, 3, 5));
     }
 }
